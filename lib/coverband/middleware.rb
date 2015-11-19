@@ -1,6 +1,6 @@
 module Coverband
   class Middleware
-    
+
     def initialize(app)
       @app = app
     end
@@ -12,6 +12,5 @@ module Coverband
       Coverband::Base.instance.report_coverage
       results
     end
-    
   end
 end

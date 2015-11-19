@@ -8,19 +8,19 @@ module Coverband
       @enabled = true
       record_coverage
     end
-    
+
     def stop
       @enabled = false
       unset_tracer
     end
-    
+
     def sample
       configure_sampling
       record_coverage
       yield
       report_coverage
     end
-    
+
     def save
       @enabled = true
       report_coverage
@@ -29,6 +29,10 @@ module Coverband
 
     def extended?
       false
+    end
+
+    def files
+      @files
     end
 
     def reset_instance
@@ -79,6 +83,8 @@ module Coverband
 
       unset_tracer
 
+      Coverband.configuration.report_callback.call if Coverband.configuration.report_callback
+
       if @verbose
         @logger.info "coverband file usage: #{@file_usage.sort_by {|_key, value| value}.inspect}"
         if @verbose=="debug"
@@ -127,7 +133,7 @@ module Coverband
     end
 
     def add_file(file, line)
-      if !file.match(/(\/gems\/|internal\:prelude)/) && file.match(@project_directory) && !@ignore_patterns.any?{|pattern| file.match(/#{pattern}/) } 
+      if !file.match(/(\/gems\/|internal\:prelude)/) && file.match(@project_directory) && !@ignore_patterns.any?{|pattern| file.match(/#{pattern}/) }
         add_file_without_checks(file, line)
       end
     end
@@ -149,7 +155,7 @@ module Coverband
         @file_line_usage[file][line] += 1
       end
       if @files.include?(file)
-        @files[file] << line unless @files.include?(line)
+        @files[file] << line unless @files[file].include?(line)
       else
         @files[file] = [line]
       end
